@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  redis-proxy-cache-service-0:
+    build:
+      context: ./RedisProxy
+      args:
+        PORT: 5000
+    ports:
+      - 5000:5000
+  redis-proxy-cache-service-1:
+    build:
+      context: ./RedisProxy
+      args:
+        PORT: 5001
+    ports:
+      - 5001:5001
+  redis-service:
+    image: redis:latest
