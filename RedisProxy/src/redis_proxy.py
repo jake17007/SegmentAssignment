@@ -1,4 +1,5 @@
 import sys
+import time
 
 from flask import (
     Flask,
@@ -20,6 +21,19 @@ cache = Cache(REDIS_ADDRESS, '6379', None, CACHE_EXP_SECS, CACHE_MAX_KEYS)
 def get():
     value = cache.get(request.args.get('myKey'))
     return value
+
+
+@app.route('/slow', methods=['GET'])
+def slow():
+    start = time.time()
+    time.sleep(10)
+    end = time.time()
+    return 'Start: {}, End: {}'.format(start, end)
+
+
+@app.route('/fast', methods=['GET'])
+def fast():
+    return 'fast finished'
 
 
 if __name__ == '__main__':

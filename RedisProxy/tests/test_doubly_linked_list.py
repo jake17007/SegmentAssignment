@@ -43,29 +43,29 @@ class DllistTest(TestCase):
         self.assertEqual(self.node3, self.dllist.top)
         self.assertEqual(self.node1, self.dllist.bottom)
 
-    def test_trim_tail(self):
+    def test_trim_bottom(self):
 
         self.dllist.append_to_head(self.node1)
         self.dllist.append_to_head(self.node2)
         self.dllist.append_to_head(self.node3)
 
-        # Trim tail with three nodes (1, 2, 3)
-        self.dllist.trim_tail()
+        # Trim bottom with three nodes (1, 2, 3)
+        self.dllist.trim_bottom()
         self.assertEqual(self.node3, self.dllist.top)
         self.assertEqual(self.node2, self.dllist.bottom)
 
-        # Trim tail with two nodes (2, 3)
-        self.dllist.trim_tail()
+        # Trim bottom with two nodes (2, 3)
+        self.dllist.trim_bottom()
         self.assertEqual(self.node3, self.dllist.top)
         self.assertEqual(self.node3, self.dllist.bottom)
 
-        # Trim tail with one node (3)
-        self.dllist.trim_tail()
+        # Trim bottom with one node (3)
+        self.dllist.trim_bottom()
         self.assertEqual(None, self.dllist.top)
         self.assertEqual(None, self.dllist.bottom)
 
         # Trim empty dllist
-        self.dllist.trim_tail()
+        self.dllist.trim_bottom()
         self.assertEqual(None, self.dllist.top)
         self.assertEqual(None, self.dllist.bottom)
 
@@ -81,7 +81,7 @@ class DllistTest(TestCase):
         self.assertEqual(self.node4, self.dllist.top)
         self.assertEqual(self.node1, self.dllist.bottom)
 
-        # Delete tail node ([1], 3, 4)
+        # Delete bottom node ([1], 3, 4)
         self.dllist.delete(self.node1)
         self.assertEqual(self.node4, self.dllist.top)
         self.assertEqual(self.node3, self.dllist.bottom)

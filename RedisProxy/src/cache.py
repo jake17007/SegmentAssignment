@@ -34,6 +34,7 @@ class CacheStorage(Dllist):
             return
         local_value_node = self.lookup[key]
         if not local_value_node.expired(self.expiry_secs):
+            self.move_to_top(local_value_node)
             return local_value_node.value
 
     # May need to lock this for use with threading
@@ -41,7 +42,7 @@ class CacheStorage(Dllist):
         if key in self.lookup:
             self.delete(self.lookup[key])
         if self.total_keys == self.max_keys:
-            self.trim_tail()
+            self.trim_bottom()
         else:
             self.total_keys += 1
         local_value_node = LocalValueNode(value)

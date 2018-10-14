@@ -21,7 +21,7 @@ class Dllist:
             node.child = self.top
             self.top = node
 
-    def trim_tail(self):
+    def trim_bottom(self):
         if self.bottom and self.bottom.parent:  # List contains multiple nodes
             self.bottom.parent.child = None
             self.bottom = self.bottom.parent
@@ -42,3 +42,9 @@ class Dllist:
         else:                           # Node is only one in list
             self.top = None
             self.bottom = None
+
+    def move_to_top(self, node):
+        if self.top == node:
+            return
+        self.delete(node)
+        self.append_to_head(node)
