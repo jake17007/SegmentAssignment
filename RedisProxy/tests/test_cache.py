@@ -6,14 +6,14 @@ from unittest import (
 from RedisProxy.cache import (
     Cache,
     CacheStorage,
-    LocalValueNode
+    LocalKVNode
 )
 
 
-class LocalValueNodeTest(TestCase):
+class LocalKVNodeTest(TestCase):
 
     def setUp(self):
-        self.lvn = LocalValueNode(1)
+        self.lvn = LocalKVNode(1)
         self.lvn.timestamp = 10.0
 
     @mock('time.time', spec_set=True)

@@ -15,5 +15,4 @@ class RedisEngine:
                                                             self.port))
 
     def get(self, key):
-        self.conn.set('key1', 'value1')
         return self.conn.get(key)

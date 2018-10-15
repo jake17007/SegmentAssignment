@@ -7,17 +7,16 @@ from doubly_linked_list import (
 )
 
 
-class LocalValueNode(DllistNode):
+class LocalKVNode(DllistNode):
 
-    def __init__(self, value):
-        super(LocalValueNode, self).__init__(value)
+    def __init__(self, key, value):
+        super(LocalKVNode, self).__init__({'k': key, 'v': value})
+        self.k = key
+        self.v = value
         self.timestamp = time.time()
 
     def expired(self, expiry_secs):
         return time.time() - self.timestamp > expiry_secs
-
-    def get_value(self):
-        return self.value
 
 
 class CacheStorage(Dllist):
@@ -32,22 +31,27 @@ class CacheStorage(Dllist):
     def get(self, key):
         if key not in self.lookup:
             return
-        local_value_node = self.lookup[key]
-        if not local_value_node.expired(self.expiry_secs):
-            self.move_to_top(local_value_node)
-            return local_value_node.value
+        local_kv_node = self.lookup[key]
+        if not local_kv_node.expired(self.expiry_secs):
+            self.move_to_top(local_kv_node)
+            print(local_kv_node.value)
+            return local_kv_node.v
 
     # May need to lock this for use with threading
     def set(self, key, value):
         if key in self.lookup:
             self.delete(self.lookup[key])
         if self.total_keys == self.max_keys:
+            print('trim_bottom called with {}'.format(key))
+            print(self.bottom.value)
+            del self.lookup[self.bottom.k]
             self.trim_bottom()
         else:
+            print('+= 1 called with {}'.format(key))
             self.total_keys += 1
-        local_value_node = LocalValueNode(value)
-        self.append_to_head(local_value_node)
-        self.lookup[key] = local_value_node
+        local_kv_node = LocalKVNode(key, value)
+        self.append_to_head(local_kv_node)
+        self.lookup[key] = local_kv_node
 
 
 class Cache:
