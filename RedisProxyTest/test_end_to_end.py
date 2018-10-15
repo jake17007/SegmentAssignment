@@ -3,8 +3,8 @@ import time
 import requests
 from redis import Redis
 
-REDIS_ADDRESS = '127.0.0.1'
-PROXY_ADDRESS = '127.0.0.1'
+REDIS_ADDRESS = 'redis-service'
+PROXY_ADDRESS = 'redis-proxy-cache-service-0'
 PROXY_PORT = '5000'
 
 R = Redis(REDIS_ADDRESS, 6379, None)

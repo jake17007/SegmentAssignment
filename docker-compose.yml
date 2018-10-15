@@ -1,6 +1,8 @@
 version: '3'
 
 services:
+  redis-service:
+    image: redis:latest
   redis-proxy-cache-service-0:
     build:
       context: ./RedisProxy
@@ -8,10 +10,12 @@ services:
         PROXY_PORT: 5000
     environment:
       - REDIS_ADDRESS=redis-service
-      - CACHE_EXP_SECS=5
+      - CACHE_EXP_SECS=2
       - CACHE_MAX_KEYS=3
     ports:
       - 5000:5000
+    depends_on:
+      - 'redis-service'
   redis-proxy-cache-service-1:
     build:
       context: ./RedisProxy
@@ -19,12 +23,16 @@ services:
         PROXY_PORT: 5001
     environment:
       - REDIS_ADDRESS=redis-service
-      - CACHE_EXP_SECS=5
+      - CACHE_EXP_SECS=2
       - CACHE_MAX_KEYS=3
     ports:
       - 5001:5001
-  redis-service:
-    image: redis:latest
+    depends_on:
+      - 'redis-service'
   test-service:
     build:
       context: ./RedisProxyTest
+    depends_on:
+      - 'redis-proxy-cache-service-0'
+      - 'redis-proxy-cache-service-1'
+      - 'redis-service'
