@@ -53,6 +53,16 @@ class CacheStorage(Dllist):
         self.append_to_head(local_kv_node)
         self.lookup[key] = local_kv_node
 
+    def clear_cache(self):
+        print(self.lookup)
+        print('clearing...')
+        self.lookup.clear()
+        self.total_keys = 0
+        self.top = None
+        self.bottom = None
+        print('cleared.')
+        print(self.lookup)
+
 
 class Cache:
 
@@ -61,6 +71,13 @@ class Cache:
         self.cache_storage = CacheStorage(expiry_secs, max_keys)
 
     def get(self, key):
+        print()
+        print()
+        print('When key is {}'.format(key))
+        print('lookup is: ')
+        print(self.cache_storage.lookup)
+        print()
+        print()
         value = self.cache_storage.get(key)
         if value:
             return value
@@ -68,3 +85,7 @@ class Cache:
         if value:
             self.cache_storage.set(key, value)
             return value
+
+    def clear_cache(self):
+        print('called')
+        self.cache_storage.clear_cache()
