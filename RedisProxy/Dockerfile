@@ -1,8 +1,21 @@
 FROM python:3.6.6-alpine3.6
+
+# Copy RedisProxy files to Docker container
 COPY . /app
 WORKDIR /app
+
+# Initialize arguments
+ARG PROXY_PORT_
+
+# Install required Python packages
 RUN pip install -r requirements.txt
-ARG PROXY_PORT
-EXPOSE $PROXY_PORT
-ENV PROXY_PORT_ $PROXY_PORT
-CMD ["sh", "-c", "python ./src/redis_proxy.py $REDIS_ADDRESS $CACHE_EXP_SECS $CACHE_MAX_KEYS $PROXY_PORT_"]
+
+# Expose the given port for the HTTP server to run on
+EXPOSE $PROXY_PORT_
+
+# Cast ARG as ENV to be used in the CMD
+ENV PROXY_PORT $PROXY_PORT_
+
+# Start the server
+WORKDIR ./src
+ENTRYPOINT ["sh", "-c", "gunicorn --bind 0.0.0.0:$PROXY_PORT server"]

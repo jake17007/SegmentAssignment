@@ -1,23 +1,22 @@
+import os
+
 import requests
 from redis import Redis
 
-# Local debugging
-REDIS_ADDRESS = '127.0.0.1'
-PROXY_ADDRESS = '127.0.0.1'
-PROXY_PORT = '5000'
-'''
-# Docker debugging
-REDIS_ADDRESS = 'redis-service'
-PROXY_ADDRESS = 'redis-proxy-cache-service-0'
-PROXY_PORT = '5000'
-'''
+REDIS_ADDRESS = os.environ.get('REDIS_ADDRESS', 'redis-service')
+PROXY_ADDRESS_0 = os.environ.get('PROXY_ADDRESS_0',
+                                 'redis-proxy-cache-service-0')
+PROXY_PORT_0 = os.environ.get('PROXY_PORT_0', 5000)
+PROXY_ADDRESS_1 = os.environ.get('PROXY_ADDRESS_1',
+                                 'redis-proxy-cache-service-1')
+PROXY_PORT_1 = os.environ.get('PROXY_PORT_1', 5001)
 
 
 class MyTestEngine:
 
-    def __init__(self):
+    def __init__(self, proxy_address=PROXY_ADDRESS_0, proxy_port=PROXY_PORT_0):
         self.redis_conn = Redis(REDIS_ADDRESS, 6379, None)
-        self.proxy_url = 'http://' + PROXY_ADDRESS + ':' + PROXY_PORT
+        self.proxy_url = 'http://' + proxy_address + ':' + proxy_port
 
     def clear_redis(self):
         self.redis_conn.flushall()
