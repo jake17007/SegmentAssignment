@@ -3,7 +3,7 @@ Redis Cache Proxy Assignment for Segment
 
 ## Architecture Overview
 
-![(ArchitectureImg.png)](https://raw.githubusercontent.com/jake17007/SegmentAssignment/master/ArchitectureImg.png)
+![(ArchitectureImg.png)](https://raw.githubusercontent.com/jake17007/SegmentAssignment/master/readme_images/ArchitectureImg.png)
 
 The Redis HTTP Cache Proxy is a containerized service that allows clients to query data stored in a single Redis database via HTTP. It holds a "Least Recently Used" (LRU) cache, per-instance configurable, as a way of optimizing the efficiency of queries and reducing load on the Redis backing instance.
 
@@ -83,7 +83,7 @@ The `RedisProxyTest` directory contains a test engine for manipulating the cache
 
 ## Algorithmic Complexity of the Cache Operations
 
-![(CacheImg.png)](https://raw.githubusercontent.com/jake17007/SegmentAssignment/master/CacheImg.png)
+![(CacheImg.png)](https://raw.githubusercontent.com/jake17007/SegmentAssignment/master/readme_images/CacheImg.png)
 
 The cache storage is composed of a hash map, mapping a given key to a respective node in a doubly-linked list. This nodes contains the value along with the key, timestamp, parent node (pertaining to a key that was used more recently), and child node (pertaining to a key that was used less recently).
 
