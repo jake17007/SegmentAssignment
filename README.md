@@ -141,7 +141,7 @@ For example, you can edit the MAX_CONNECTIONS, REDIS_ADDRESS, CACHE_EXP_SECS, CA
 - Platform (3 hours)
 - Testing (1.5 hours)
 - Documentation (1.5 hours)
-- Note: I spent a bit longer than listed on most of these items, to try to get them just right, but some of this work was probably not necessary. The platform took a while because I did not have much experience with Docker and docker-compose (and they are confusing with convoluted documentation, but I wanted to learn them!).
+- Note: I spent a bit longer on most of these items, to try to get them just right. The platform took a while because I did not have much experience with Docker and docker-compose (and they are confusing with convoluted documentation, but I wanted to learn them!).
 
 ## Requirements Not Implemented
 
