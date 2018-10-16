@@ -84,3 +84,27 @@ The `RedisProxyTest` directory contains a test engine for manipulating the cache
 ### Algorithmic Complexity of the Cache Operations
 
 ![(CacheImg.png)](https://raw.githubusercontent.com/jake17007/SegmentAssignment/master/CacheImg.png)
+
+The cache storage is composed of a hash map, mapping a given key to a respective node in a doubly-linked list. This nodes contains the value along with the key, timestamp, parent node (pertaining to a key that was used more recently), and child node (pertaining to a key that was used less recently).
+
+The time complexity for any given operation on the cache is O(1), i.e. constant time. The space complexity of the cache is O(*m*), where *m* is the maximum threshold of key-value pairs, which has been configured at instantiation. The operations are explained in more detail below.
+
+#### Getting a Key Existing in Cache
+
+The time complexity to retrieve the value for a given key that exists in the cache is O(1). This is because the keys existing in the cache are stored in a hash map, mapping the keys to nodes containing the value.
+
+#### Getting a Key Existing Only in Redis Backing Instance
+
+If the cache does not contain a given key, it will attempt to load from the Redis backing instance. If it is found, it will be added to the top of the doubly-linked list and returned. Since we keep track of which node is `top`, this is done in O(1) time.
+
+### Pushing Out LRU (Least-Recently Used) Keys
+
+When the cache is at maximum capacity and a new key needs to be added, the LRU is removed from the linked list. We check which node is `bottom`, modify its parent to be the new bottom and remove its connection to the pushed out node, and remove the key from the lookup. This all happens in O(1) time.
+
+### Moving MRU (Most-Recently Used) Keys to the Top
+
+When key that had already existed in the cache is requested, it becomes the MRU key. Therefore, it needs to be moved to the top. We remove it from its current position by modifying parent/child links to/from surrounding nodes, and append it to the top. This happens in O(1) time.
+
+### Checking Expiration
+
+When a node is inserted into the doubly-linked list, we attached a timestamp. When we retrieve a node, we check that the node is not expired by comparing it to the current time and the global expiry. If the node is expired we attempt to retrieve it from the Redis backing instance. If it is retrieved, the new node will be added to the top (and before doing so delete the old node from the cache). If it is not found, while we could, it's not necessary to remove the expired node from the cache because all nodes less recently used will also be expired. They will just get pushed out as more nodes are added. This happens in O(1).
