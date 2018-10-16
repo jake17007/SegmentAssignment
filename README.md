@@ -132,3 +132,17 @@ I.e.:
 - `docker-compose.yml`
 
 For example, you can edit the MAX_CONNECTIONS, REDIS_ADDRESS, CACHE_EXP_SECS, CACHE_MAX_KEYS variables.
+
+## How Long I Spent on Each Part of the Project
+
+- HTTP Web Service (1.5 hours)
+- Redis Setup (1.5 hour)
+- Cache (1.5 hours)
+- Platform (2 hours)
+- Testing (1.5 hours)
+- Documentation (1.5 hours)
+- Note: I spent a bit longer than listed on most of these items, to try to get them just right, but some of this work was probably not necessary.
+
+## Requirements Not Implemented
+
+I did not implement the bonus requirements as of yet. While I would have liked to, I didn't have time. All other requirements should be implemented.
