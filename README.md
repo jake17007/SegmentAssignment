@@ -26,3 +26,57 @@ End-to-end tests exist to test the functionality of the architecture.
 ### Docker
 
 The Redis HTTP Cache Proxy, including the API and cache, Redis backing instance, and end-to-end testing unit are instatiated as separate Docker containers. For the purposes of this assignment, the containers are initialized in a docker-compose file.
+
+## What the Code Does
+
+```
+├── Diagram.png
+├── Makefile
+├── README.md
+├── RedisProxy
+├── RedisProxyTest
+└── docker-compose.yml
+```
+
+### RedisProxy
+
+The `RedisProxy` directory contains the API and cache as well as a Dockerfile and requirements.txt for container instantiation.
+
+```
+├── RedisProxy
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── src
+│       ├── __init__.py
+│       ├── cache.py
+│       ├── doubly_linked_list.py
+│       ├── redis_engine.py
+│       ├── redis_proxy.py
+│       └── server.py
+```
+
+- `cache.py`: a `Cache` class and supporting classes that store key-value pair and handles LRU and global expiry functionality
+- `doubly_linked_list.py`: a class for basic doubly-linked-list and node funtionality (from which the `Cache` class inherits)
+- `redis_engine.py`: a `RedisEngine` class for connecting to the Redis backing instance; the `Cache` class uses this to load unknown key-value pairs
+- `redis_proxy.py`: a Flask application that contains the client facing API endpoints; contains a `Cache` class to load data
+- `server.py`: a file for instantiating the server with Gunicorn
+
+### RedisProxyTest
+
+The `RedisProxyTest` directory contains a test engine for manipulating the cache and Redis database for tests, end-to-end tests that make HTTP requests to a given Redis Cache Proxy instance, and a Dockerfile and requirements.txt for container instantiation. Tests are run the the PyTest Python package.
+
+```
+├── RedisProxyTest
+│   ├── Dockerfile
+│   ├── my_test_engine.py
+│   ├── populate_for_fun.py
+│   ├── requirements.txt
+│   ├── test_cached_get.py
+│   ├── test_global_expiry.py
+│   ├── test_http_web_service.py
+│   ├── test_lru_eviction_fixed_key_size.py
+│   └── test_single_backing_instance.py
+```
+
+- `my_test_engine.py`: a `MyTestEngine` class for connecting to and manipulating the cache and Redis database
+- `test_*.py`: end-to-end test files for testing system functionality
