@@ -81,7 +81,7 @@ The `RedisProxyTest` directory contains a test engine for manipulating the cache
 - `my_test_engine.py`: a `MyTestEngine` class for connecting to and manipulating the cache and Redis database
 - `test_*.py`: end-to-end test files for testing system functionality
 
-### Algorithmic Complexity of the Cache Operations
+## Algorithmic Complexity of the Cache Operations
 
 ![(CacheImg.png)](https://raw.githubusercontent.com/jake17007/SegmentAssignment/master/CacheImg.png)
 
@@ -89,11 +89,11 @@ The cache storage is composed of a hash map, mapping a given key to a respective
 
 The time complexity for any given operation on the cache is O(1), i.e. constant time. The space complexity of the cache is O(*m*), where *m* is the maximum threshold of key-value pairs, which has been configured at instantiation. The operations are explained in more detail below.
 
-#### Getting a Key Existing in Cache
+### Getting a Key Existing in Cache
 
 The time complexity to retrieve the value for a given key that exists in the cache is O(1). This is because the keys existing in the cache are stored in a hash map, mapping the keys to nodes containing the value.
 
-#### Getting a Key Existing Only in Redis Backing Instance
+### Getting a Key Existing Only in Redis Backing Instance
 
 If the cache does not contain a given key, it will attempt to load from the Redis backing instance. If it is found, it will be added to the top of the doubly-linked list and returned. Since we keep track of which node is `top`, this is done in O(1) time.
 
