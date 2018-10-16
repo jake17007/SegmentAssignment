@@ -123,7 +123,7 @@ $ make test
 
 This will run docker-compose to spin up the Docker containers -- a container for Redis, two separate Redis Proxy Cache on two separate containers, and a container to run end-to-end tests.
 
-After the tests complete, the containers will still be running. At this time you can test the endpoints by pointing your browser to `127.0.0.1:5000?requestedKey=SEGMENT` (port `5001` will also work). You can also manipulate the Redis backing instance with `redis-cli` via the default port `6379`.
+After the tests complete, the containers will still be running. At this time you can test the endpoints by pointing your browser to `127.0.0.1:5000?requestedKey=SEGMENT` (port `5001` will also work; you may have to wait a few seconds if the browswer doesn't immediately connect). You can also manipulate the Redis backing instance with `redis-cli` via the default port `6379`.
 
 To run the code in a customized way, you should edit the `docker-compose.yml` and `Dockerfile`s.
 
