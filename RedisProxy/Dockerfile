@@ -18,4 +18,4 @@ ENV PROXY_PORT $PROXY_PORT_
 
 # Start the server
 WORKDIR ./src
-ENTRYPOINT ["sh", "-c", "gunicorn --bind 0.0.0.0:$PROXY_PORT server"]
+ENTRYPOINT ["sh", "-c", "gunicorn --bind 0.0.0.0:$PROXY_PORT --backlog $MAX_CONNECTIONS server"]
