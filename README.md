@@ -119,6 +119,8 @@ $ cd SegmentAssignment
 $ make test
 ```
 
+(If you don't have a GitHub SSH key setup clone with: `$ git clone https://github.com/jake17007/SegmentAssignment.git`)
+
 This will run docker-compose to spin up the Docker containers -- a container for Redis, two separate Redis Proxy Cache on two separate containers, and a container to run end-to-end tests.
 
 After the tests complete, the containers will still be running. At this time you can test the endpoints by pointing your browser to `127.0.0.1:5000?requestedKey=SEGMENT` (port `5001` will also work). You can also manipulate the Redis backing instance with `redis-cli` via the default port `6379`.
