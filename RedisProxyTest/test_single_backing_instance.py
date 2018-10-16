@@ -1,5 +1,5 @@
 """
-These request tests are to be run in order against a RedisProxy configured
+These request tests are to be run against a RedisProxy configured
 with a cache that has a max key value pair count of 3 and whose key value pairs
 expire after 2 seconds.
 """
