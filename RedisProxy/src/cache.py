@@ -1,3 +1,4 @@
+import threading
 import time
 
 from redis_engine import RedisEngine
@@ -5,6 +6,8 @@ from doubly_linked_list import (
     Dllist,
     DllistNode
 )
+
+lock = threading.RLock()
 
 
 class LocalKVNode(DllistNode):
@@ -49,14 +52,14 @@ class CacheStorage(Dllist):
         Returns:
             str or None: the value or None if not found
         """
-        if key not in self.lookup:
-            return
-        local_kv_node = self.lookup[key]
-        if not local_kv_node.expired(self.expiry_secs):
-            self.move_to_top(local_kv_node)
-            return local_kv_node.v
+        with lock:
+            if key not in self.lookup:
+                return
+            local_kv_node = self.lookup[key]
+            if not local_kv_node.expired(self.expiry_secs):
+                self.move_to_top(local_kv_node)
+                return local_kv_node.v
 
-    # May need to lock this for use with threading
     def set(self, key, value):
         """
         Set the value for a given key
@@ -64,25 +67,27 @@ class CacheStorage(Dllist):
             key str: the key to be set
             value str: the value to be set
         """
-        if key in self.lookup:
-            self.delete(self.lookup[key])
-        if self.total_keys == self.max_keys:
-            del self.lookup[self.bottom.k]
-            self.trim_bottom()
-        else:
-            self.total_keys += 1
-        local_kv_node = LocalKVNode(key, value)
-        self.append_to_head(local_kv_node)
-        self.lookup[key] = local_kv_node
+        with lock:
+            if key in self.lookup:
+                self.delete(self.lookup[key])
+            if self.total_keys == self.max_keys:
+                del self.lookup[self.bottom.k]
+                self.trim_bottom()
+            else:
+                self.total_keys += 1
+            local_kv_node = LocalKVNode(key, value)
+            self.append_to_head(local_kv_node)
+            self.lookup[key] = local_kv_node
 
     def clear_cache(self):
         """
         Clear the cache
         """
-        self.lookup.clear()
-        self.total_keys = 0
-        self.top = None
-        self.bottom = None
+        with lock:
+            self.lookup.clear()
+            self.total_keys = 0
+            self.top = None
+            self.bottom = None
 
 
 class Cache:
@@ -90,6 +95,7 @@ class Cache:
     def __init__(self, host, port, password, expiry_secs, max_keys):
         self.backing_instance = RedisEngine(host, port, password)
         self.cache_storage = CacheStorage(expiry_secs, max_keys)
+        self.queued_keys = set()
 
     def get(self, key):
         """
@@ -99,12 +105,31 @@ class Cache:
         Returns:
             str or None: the value or None if not found
         """
-        value = self.cache_storage.get(key)
-        if value:
-            return value
-        value = self.backing_instance.get(key)
-        if value:
-            self.cache_storage.set(key, value)
+        # Yield execution to other threads if another thread is already
+        # currently retrieving the key-value pair from Redis backing instance
+        while key in self.queued_keys:
+            time.sleep(0)
+
+        # Attempt to retrieve the key-value pair from cache storage; return the
+        # value if the key was found
+        with lock:
+            value = self.cache_storage.get(key)
+            if value:
+                return value
+
+        # If the key was not found in cache storage, indicate (to other
+        # threads) that this thread will attempt to retrieve the key-value pair
+        # from the Redis backing instance, and do so
+        self.queued_keys.add(key)
+        value = self.backing_instance.get(key)  # non-blocking
+
+        # If the key was found, set the key-value pair in the cache storage.
+        # Then, even if it was not found, remove the key from queued keys
+        # and return the result
+        with lock:
+            if value:
+                self.cache_storage.set(key, value)
+            self.queued_keys.remove(key)
             return value
 
     def clear_cache(self):
