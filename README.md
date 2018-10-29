@@ -9,7 +9,23 @@ The Redis HTTP Cache Proxy is a containerized service that allows clients to que
 
 ### API
 
-The client facing API contains a GET endpoint that allows users to query by key, as if they were querying the Redis database. It is written in Flask and served by Gunicorn. The server is configurable at proxy instantiation with options to limit the number of pending connections to the server and determine whether the processing of requests should run in a concurrent sequential or multi-threaded parallel manner (though the multi-threaded manner has not been sufficiently tested).
+The client facing API contains a GET endpoint that allows users to query by key, as if they were querying the Redis database. It is written in Flask and served by Gunicorn. The server is configurable at proxy instantiation with options to limit the number of pending connections to the server and determine whether how to process requests. If no number of threads is specified, each new request will have to wait for the requests preceding it to finish. If a number of threads is specified, requests will be handled in an asynchronous way.
+
+#### EDIT UPDATES:
+
+The first submission did handle concurrent requests if the server was initialized *without* the threading option. However, if two clients requested a key at the same time, the second one would have to wait for the first one to finish completely. Furthermore, if the server *was* initialized with the threading option, concurrent requests would likely cause errors in the cache, a shared resource, due to the lack of locking. It's important note that due to Python's [Global Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock) (GIL), only one thread can execute at a time, but the threads can be interleaved (so locks are still required for shared resources).
+
+The current submission does handle concurrent requests with the threading option. There a several locks put in place to do so.
+
+When a client requests a key, the server will lock the `CacheStorage` resource and look for that key. If it's there, it will return the value. At that time no other threads can access the cache.
+
+If the key is *not* in the cache, the server will make a non-blocking query to the Redis backing instance. This allows other threads to access the cache while the Redis query is in progress. Additionally, the key will be added to a global set as a flag to indicate to other threads that it is currently retrieving that key. I.e. it's saying "I'm already getting this key. If you need the same key, please wait. While you wait, let other threads take over execution so they can get keys from the cache." When the key is finally retrieved from the Redis backing instance, it's stored in the cache and this flag is removed.
+
+There are also locks on the `CacheStorage`'s `get` and `set` methods. These were put in place incase any future modifications wanted to use the methods outside the `Cache` class. All locks are of the type `RLock`, re-entrant locks. This type of lock only blocks if a *different* thread attempts to take over the lock; they do not block if the same thread does so. This allows for nested locks without the worry of unnecessary blocking.
+
+Tests:
+
+An end-to-end test was implemented to test concurrency with the server running in threaded mode. However, this test isn't able to access and verify the lower level details of how the server and cache should be operating. So, I included something of a cache unittest in `RedisProxy/src/test_cache.py`. It can be run with pytest and verifies that specific code is being run in the case of multiple threads being run concurrently. See the comments in the file for more details.
 
 ### Cache
 
